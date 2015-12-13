@@ -6,9 +6,6 @@ class MsUpload {
 		global $wgOut, $wgScriptPath, $wgJsMimeType, $wgMSL_FileTypes, $wgMSU_useMsLinks, $wgMSU_showAutoCat, $wgMSU_autoIndex, $wgMSU_checkAutoCat, $wgMSU_confirmReplace, $wgMSU_useDragDrop, $wgMSU_imgParams, $wgFileExtensions;
 
 		$wgOut->addModules( 'ext.MsUpload' );
-		$wgOut->addJsConfigVars( array(
-			'wgFileExtensions' => array_values( array_unique( $wgFileExtensions ) ),
-		));
 
 		if ( $wgMSU_imgParams ) {
 			$wgMSU_imgParams = '|' . $wgMSU_imgParams;
@@ -25,9 +22,22 @@ class MsUpload {
 			//'autoIndex' => $wgMSU_autoIndex,
 		);
 
-		$msuVars = json_encode( $msuVars );
-		$wgOut->addScript( "<script type=\"$wgJsMimeType\">var msuVars = $msuVars;</script>\n" );
+		$wgOut->addJsConfigVars( array(
+			'wgFileExtensions' => array_values( array_unique( $wgFileExtensions ) ),
+			'msuVars' => $msuVars,
+		));
 
+		return true;
+	}
+
+	static function wikiEditor()
+	{
+		global $wgOut, $wgResourceModules;
+		if (in_array('ext.wikiEditor.toolbar', $wgOut->getModules()))
+		{
+			$wgOut->addModules('ext.MsUpload.wikiEditor');
+			self::start();
+		}
 		return true;
 	}
 

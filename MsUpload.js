@@ -1,6 +1,6 @@
 var $ = jQuery,
 	mw = mediaWiki,
-	msuVars = window.msuVars;
+	msuVars = mw.config.get('msuVars');
 
 function fileError( uploader, file, errorText ) {
 	file.li.warning.text( errorText );
@@ -218,7 +218,7 @@ function checkExtension( file, uploader ) {
 	}
 }
 
-function createUpload( wikiEditor ) {
+window.createMsUploader = function( wikiEditor ) {
 	// Create upload button
 	var uploadButton = $( '<div>' ).attr( 'id', 'upload-select' );
 	var uploadContainer = $( '<div>' ).attr({
@@ -540,15 +540,11 @@ function createUpload( wikiEditor ) {
 	uploader.init();
 }
 
-$( function () {
+$( function() {
 	// Check if we are in edit mode and the required modules are available and then customize the toolbar
 	if ( $.inArray( mw.config.get( 'wgAction' ), [ 'edit', 'submit' ] ) !== -1 ) {
-		if ( mw.user.options.get( 'usebetatoolbar' ) ) {
-			mw.loader.using( 'ext.wikiEditor.toolbar', function () {
-				createUpload( true );
-			});
-		} else {
-			createUpload( false );
+		if ( !mw.user.options.get( 'usebetatoolbar' ) ) {
+			createMsUploader( false );
 		}
 	}
 });

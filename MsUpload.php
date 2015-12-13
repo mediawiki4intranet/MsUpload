@@ -14,7 +14,7 @@ $wgResourceModules['ext.MsUpload'] = array(
 		'plupload/plupload.full.min.js',
 		'MsUpload.js'
 	),
-	'dependencies' => 'jquery.ui.progressbar',
+	'dependencies' => array('jquery.ui.progressbar'),
 	'styles' => 'MsUpload.css',
 	'messages' => array(
 		'msu-description',
@@ -38,6 +38,17 @@ $wgResourceModules['ext.MsUpload'] = array(
 	'localBasePath' => __DIR__,
 	'remoteExtPath' => 'MsUpload',
 );
+
+$wgResourceModules['ext.MsUpload.wikiEditor'] = array(
+	'dependencies' => array('ext.wikiEditor.toolbar', 'ext.MsUpload'),
+	'scripts' => array(
+		'MsUpload.wikiEditor.js'
+	),
+	'localBasePath' => __DIR__,
+	'remoteExtPath' => 'MsUpload',
+);
+
+$wgHooks['WikiEditorAddModules'][] = 'MsUpload::wikiEditor'; // dynamic initialization
 
 $wgMessagesDirs['MsUpload'] = __DIR__ . '/i18n';
 
