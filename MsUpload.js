@@ -352,9 +352,11 @@ function createUpload( wikiEditor ) {
 
 	uploader.bind( 'Error', function ( uploader, error ) {
 		mw.log( error );
-		$( '#' + error.file.id + ' span.file-warning' ).html(
-			'Error: ' + error.code + ', Message: ' + error.message + ( error.file ? ', File: ' + error.file.name : '' )
-		);
+		if ( error.file ) {
+			$( '#' + error.file.id + ' span.file-warning' ).html(
+				'Error: ' + error.code + ', Message: ' + error.message + ( error.file ? ', File: ' + error.file.name : '' )
+			);
+		}
 		statusDiv.append( error.message );
 		uploader.refresh(); // Reposition Flash/Silverlight
 	});
