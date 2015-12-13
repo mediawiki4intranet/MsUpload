@@ -20,6 +20,6 @@
 	"msu-ext-not-allowed": "Разрешен{{PLURAL:$1||ы}} только {{PLURAL:$1|следующий тип|следующие типы}} файлов:",
 	"msu-upload-this": "Загрузить этот файл",
 	"msu-upload-all": "Загрузить все файлы",
-	"msu-dropzone": "Перетащите файлы сюда",
+	"msu-dropzone": "Перетащите или вставьте (Ctrl-V) файлы сюда",
 	"msu-comment": "MsUpload"
 }

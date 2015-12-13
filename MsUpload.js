@@ -274,6 +274,51 @@ function createUpload( wikiEditor ) {
 		'silverlight_xap_url': msuVars.path + '/plupload/Moxie.xap'
 	});
 
+	if (window.DataTransferItem)
+	{
+		$('html').bind('paste', function(event) {
+			var clipboardData = event.originalEvent.clipboardData;
+			if (!clipboardData.items)
+				return;
+			for (var i = 0; i < clipboardData.items.length; i++) {
+				var item = clipboardData.items[i];
+				if (item.type.match(/^image\/./)) {
+					uploader.addFile(item.getAsFile());
+				}
+			}
+		});
+	}
+	else
+	{
+		$('html').bind('keydown', function(event)
+		{
+			if (event.ctrlKey && (event.keyCode == 0x76 || event.keyCode == 0x56)) // ctrl-v
+			{
+				var p = event.target;
+				while (p)
+				{
+					if (p.nodeName == 'TEXTAREA' || p.nodeName == 'INPUT' || p.contentEditable == true || p.contentEditable == 'true')
+						return;
+					p = p.parentNode;
+				}
+				var $e = $('<div contenteditable="true" style="position: absolute; top: -10000px; height: 100px; overflow: hidden">').appendTo($('#upload-drop'));
+				setTimeout(function() {
+					if ($e[0].firstChild && $e[0].firstChild.nodeName == 'IMG' && $e[0].firstChild.src.substr(0, 5) == 'data:') {
+						var img = new mOxie.Image();
+						var mime = $e[0].firstChild.src.substr(5, $e[0].firstChild.src.indexOf(';')-5);
+						img.onload = function() {
+							uploader.addFile(img.getAsBlob(mime));
+						};
+						img.load($e[0].firstChild.src);
+					}
+					$e.remove();
+				}, 100);
+				$e[0].focus();
+			}
+			return true;
+		});
+	}
+
 	uploader.bind( 'PostInit', function ( uploader ) {
 		mw.log( 'MsUpload DEBUG: runtime: ' + uploader.runtime + ' features: ' + JSON.stringify( uploader.features ) );
 		uploadContainer.removeClass( 'start-loading' );
