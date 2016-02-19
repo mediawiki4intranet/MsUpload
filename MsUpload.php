@@ -14,7 +14,7 @@ $wgResourceModules['ext.MsUpload'] = array(
 		'plupload/plupload.full.min.js',
 		'MsUpload.js'
 	),
-	'dependencies' => array('jquery.ui.progressbar'),
+	'dependencies' => array('jquery.ui.progressbar', 'mediawiki.toolbar'),
 	'styles' => 'MsUpload.css',
 	'messages' => array(
 		'msu-description',
