@@ -64,7 +64,7 @@ function warningText( fileItem, warning, uploader ) {
 				var title = $( fileItem.warning ).siblings( '.file-title' );
 
 				var checkbox = $( '<input>' ).attr({ 'type': 'checkbox', 'checked': true }).click( function ( event ) {
-					if ( $( this ).is( ':checked' ) ) {
+					if ( this.checked ) {
 						title.show().next().hide();
 						unconfirmedReplacements--;
 					} else {
@@ -112,17 +112,67 @@ function build( file, uploader ) {
 	}
 	*/
 	// Auto category
-	if ( msuVars.showAutoCat && mw.config.get( 'wgNamespaceNumber' ) === 14 ) {
-		file.cat = msuVars.checkAutoCat; // Predefine
-		$( '<input>' ).attr({
-			'class': 'check-index',
-			'type': 'checkbox',
-			'checked': file.cat
-		}).change( function () {
-			file.cat = this.checked; // Save
-		}).appendTo( file.li );
-
-		$( '<span>' ).attr( 'class', 'check-span' ).text( wgPageName.replace( /_/g, ' ' ) ).appendTo( file.li );
+	if ( msuVars.showAutoCat ) {
+		file.cats = {};
+		file.all_cats = {};
+		var cat_box = $( '<span>' ).attr( { style: 'display: inline-block' } ).appendTo( file.li );
+		var on_change_cat = function() {
+			var cat = this.getAttribute( 'data-category' );
+			this.checked ? ( file.cats[cat] = true ) : delete file.cats[cat];
+		};
+		var add_check = function( cat ) {
+			if ( file.all_cats[cat] )
+				return;
+			file.all_cats[cat] = true;
+			$( '<label>' ).append(
+				$( '<input>' ).attr({
+					'class': 'check-index',
+					'type': 'checkbox',
+					'data-category': cat,
+					'checked': msuVars.checkAutoCat
+				}).change( on_change_cat )
+			).append(
+				$( '<span>' ).attr( 'class', 'check-span' ).text( cat.replace( /_/g, ' ' ) )
+			).appendTo( cat_box );
+			if ( msuVars.checkAutoCat ) {
+				file.cats[cat] = true;
+			}
+		};
+		if ( mw.config.get( 'wgNamespaceNumber' ) === 14 ) {
+			add_check( wgTitle );
+		}
+		var text = document.getElementById( 'wpTextbox1' ).value.replace( /\s+$/, '' );
+		if ( text != '' ) {
+			if ( uploader.last_page_text != text ) {
+				uploader.last_page_text = text;
+				$.ajax({
+					url: mw.util.wikiScript( 'api' ),
+					dataType: 'json',
+					type: 'POST',
+					data: {
+						format: 'json',
+						action: 'parse',
+						title: wgPageName,
+						text: text,
+						prop: 'categories'
+					},
+					success: function( data ) {
+						var cats = [];
+						if ( data && data.parse && data.parse.categories && data.parse.categories.length ) {
+							for ( var i = 0; i < data.parse.categories.length; i++ ) {
+								cats.push( data.parse.categories[i]['*'] );
+								add_check( data.parse.categories[i]['*'] );
+							}
+						}
+						uploader.last_page_cats = cats;
+					}
+				});
+			} else {
+				for ( var i = 0; i < uploader.last_page_cats.length; i++ ) {
+					add_check( uploader.last_page_cats[i] );
+				}
+			}
+		}
 	}
 
 	// Insert an input field for changing the file title
@@ -377,9 +427,16 @@ window.createMsUploader = function( wikiEditor ) {
 	uploader.bind( 'BeforeUpload', function ( uploader, file ) {
 		file.li.title.text( file.name ).show(); // Show title
 		$( '#' + file.id + ' input.input-change' ).hide(); // Hide input
+		var text = ' ';
+		if ( file.cats ) {
+			for ( var c in file.cats ) {
+				text += '[[Category:' + c + ']] ';
+			}
+		}
 		uploader.settings.multipart_params = {
 			'filename': file.name,
 			'token': mw.user.tokens.get( 'editToken' ),
+			'text': text,
 			'action': 'upload',
 			'ignorewarnings': true,
 			'comment': mw.msg( 'msu-comment' ),
@@ -422,14 +479,6 @@ window.createMsUploader = function( wikiEditor ) {
 				file.li.type.addClass( 'ok' );
 				file.li.addClass( 'green' );
 				file.li.warning.fadeOut( 'slow' );
-
-				if ( file.cat && mw.config.get( 'wgNamespaceNumber' ) === 14 ) { // Should the categroy be set?
-					$.get( mw.util.wikiScript(), {
-						action: 'ajax',
-						rs: 'MsUpload::saveCat',
-						rsargs: [ file.name, wgPageName ]
-					}, 'json' );
-				}
 				$( '<a>' ).text( mw.msg( 'msu-insert-link' ) ).click( function () {
 					if ( msuVars.useMsLinks === true ) {
 						mw.toolbar.insertTags( '{{#l:' + file.name + '}}', '', '', '' ); // Insert link

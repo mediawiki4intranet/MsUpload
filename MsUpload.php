@@ -56,8 +56,6 @@ $wgAutoloadClasses['MsUpload'] = __DIR__ . '/MsUpload.body.php';
 
 $wgHooks['EditPage::showEditForm:initial'][] = 'MsUpload::start';
 
-$wgAjaxExportList[] = 'MsUpload::saveCat';
-
 // Default configuration
 $wgMSU_useDragDrop = true;
 $wgMSU_showAutoCat = true;

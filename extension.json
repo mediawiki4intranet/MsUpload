@@ -57,9 +57,6 @@
 		]
 	},
 	"config": {
-		"AjaxExportList": [
-			"MsUpload::saveCat"
-		],
 		"MSU_useDragDrop": true,
 		"MSU_showAutoCat": true,
 		"MSU_checkAutoCat": true,

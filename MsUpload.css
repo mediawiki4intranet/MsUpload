@@ -80,7 +80,7 @@
 	margin-bottom: 1px;
 }
 
-#upload-list .file * {
+#upload-list .file > *, #upload-list .file input {
 	vertical-align: middle;
 }
 
@@ -270,8 +270,8 @@ a.hover {
 	color: red;
 }
 
-#upload-list .file span,
-#upload-list .file a {
+#upload-list .file > span,
+#upload-list .file > a {
 	padding: 0 4px;
 }
 
@@ -288,11 +288,13 @@ a.hover {
 	color: #8a1f11;
 }
 
-.check-index {
-	margin-top: 7px;
+#upload-list .file .check-index {
+	margin: 0 3px 0 0;
 }
 
-.check-span {
+#upload-list .file .check-span {
+	margin: 0 6px 0 0;
+	padding: 0;
 	color: #444;
 }
 
