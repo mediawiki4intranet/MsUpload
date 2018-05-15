@@ -412,13 +412,14 @@ window.createMsUploader = function( wikiEditor ) {
 
 	uploader.bind( 'FilesAdded', function ( uploader, files ) {
 		$.each( files, function ( i, file ) {
-			// iOS6 by SLBoat
-			if ( ( navigator.platform === 'iPad' || navigator.platform === 'iPhone' ) ) {
-				if ( file.name.indexOf( 'image' ) !== -1 && file.name.length < 11 ) {
-					var heute = new Date();
-					var fileNameApple = navigator.platform + '_image_' + heute.getFullYear() + '-' + heute.getMonth() + '-' + heute.getDate() + '-' + heute.getTime(); // Because each image is named 'image.jpg' in iOS6
-					file.name = fileNameApple + '_' + i + '.' + file.name.split( '.' ).pop(); // image_Y-M-D_0.jpg
-				}
+			// Each image is named 'image.jpg' in iOS6; each pasted image is named 'image.png' even in Firefox
+			if ( file.name.indexOf( 'image' ) !== -1 && file.name.length < 11 ) {
+				var d = new Date();
+				var pad = function( c ) { c = ''+c; return c.length < 2 ? '0'+c : c; };
+				file.name = navigator.platform + '_' +
+					d.getFullYear() + '-' + pad( d.getMonth() ) + '-' + pad( d.getDate() ) + '_' +
+					pad( d.getHours() ) + '-' + pad( d.getMinutes() ) + '-' + pad( d.getSeconds() ) + '_image' + i +
+					'.' + file.name.split( '.' ).pop(); // image_Y-M-D_H-i-s_0.jpg
 			}
 			file.li = $( '<li>' ).attr( 'id',file.id ).attr( 'class', 'file' ).appendTo( uploadList );
 			file.li.type = $( '<span>' ).attr( 'class', 'file-type' ).appendTo( file.li );
