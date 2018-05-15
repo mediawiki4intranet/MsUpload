@@ -33,7 +33,6 @@ function addLinks() {
 	}
 }
 
-var unconfirmedReplacements = 0;
 function warningText( fileItem, warning, uploader ) {
 	switch ( warning ) {
 		case '':
@@ -60,19 +59,17 @@ function warningText( fileItem, warning, uploader ) {
 
 			// If a file with the same name already exists, add a checkbox to confirm the replacement
 			if ( window.msuVars.confirmReplace === true ) {
-
 				var title = $( fileItem.warning ).siblings( '.file-title' );
-
 				var checkbox = $( '<input>' ).attr({ 'type': 'checkbox', 'checked': true }).click( function ( event ) {
 					if ( this.checked ) {
 						title.show().next().hide();
-						unconfirmedReplacements--;
+						fileItem.noReplace = false;
 					} else {
 						title.hide().next().show().select();
-						unconfirmedReplacements++;
+						fileItem.noReplace = true;
 					}
 					uploader.trigger( 'CheckFiles' );
-				}).click();
+				});
 				$( '<label>' ).append( checkbox ).append( mw.msg( 'msu-replace-file' ) ).appendTo( fileItem.warning );
 			}
 			break;
@@ -178,13 +175,13 @@ function build( file, uploader ) {
 	// Insert an input field for changing the file title
 	var inputChange = $( '<input>' ).attr({
 		//'id': 'input-change-' + file.id,
-		'class':'input-change',
+		'class': 'input-change',
 		'size': file.name.length,
 		'name': 'filename',
 		'value': file.name
 	}).change( function () {
 		file.name = this.value; // Save new name
-		unconfirmedReplacements = 0; // Hack! If the user renames a file to avoid replacing it, this forces the Upload button to appear, but it also does when a user just renames a file that wasn't about to replace another
+		file.li.noReplace = false;
 		checkUploadWarning( this.value, file.li, uploader );
 	}).hide().insertAfter( file.li.title );
 
@@ -536,6 +533,10 @@ window.createMsUploader = function( wikiEditor ) {
 			spacer1.hide();
 		}
 
+		var unconfirmedReplacements = 0;
+		for ( var i = 0; i < filesLength; i++ ) {
+			unconfirmedReplacements += uploader.files[i].li.noReplace ? 1 : 0;
+		}
 		if ( unconfirmedReplacements ) {
 			startButton.hide();
 			spacer1.hide();
