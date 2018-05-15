@@ -136,7 +136,7 @@ function build( file, uploader ) {
 			}
 		};
 		if ( mw.config.get( 'wgNamespaceNumber' ) === 14 ) {
-			add_check( wgTitle );
+			add_check( mw.config.get( 'wgTitle' ) );
 		}
 		if ( uploader.initial_page_cats ) {
 			for ( var i in uploader.initial_page_cats ) {
@@ -154,7 +154,7 @@ function build( file, uploader ) {
 					data: {
 						format: 'json',
 						action: 'parse',
-						title: wgPageName,
+						title: mw.config.get( 'wgPageName' ),
 						text: text,
 						prop: 'categories'
 					},
@@ -334,7 +334,7 @@ window.createMsUploader = function( wikiEditor ) {
 		data: {
 			format: 'json',
 			action: 'parse',
-			page: wgPageName,
+			page: mw.config.get( 'wgPageName' ),
 			prop: 'categories'
 		},
 		success: function( data ) {
@@ -416,7 +416,8 @@ window.createMsUploader = function( wikiEditor ) {
 			if ( file.name.indexOf( 'image' ) !== -1 && file.name.length < 11 ) {
 				var d = new Date();
 				var pad = function( c ) { c = ''+c; return c.length < 2 ? '0'+c : c; };
-				file.name = navigator.platform + '_' +
+				// 100 chars because it must be <= 200 bytes
+				file.name = mw.config.get( 'wgTitle' ).replace( /^.*\//, '' ).substr( 0, 100 ) + '_' +
 					d.getFullYear() + '-' + pad( d.getMonth() ) + '-' + pad( d.getDate() ) + '_' +
 					pad( d.getHours() ) + '-' + pad( d.getMinutes() ) + '-' + pad( d.getSeconds() ) + '_image' + i +
 					'.' + file.name.split( '.' ).pop(); // image_Y-M-D_H-i-s_0.jpg
