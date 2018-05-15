@@ -138,6 +138,11 @@ function build( file, uploader ) {
 		if ( mw.config.get( 'wgNamespaceNumber' ) === 14 ) {
 			add_check( wgTitle );
 		}
+		if ( uploader.initial_page_cats ) {
+			for ( var i in uploader.initial_page_cats ) {
+				add_check( i );
+			}
+		}
 		var text = document.getElementById( 'wpTextbox1' ).value.replace( /\s+$/, '' );
 		if ( text != '' ) {
 			if ( uploader.last_page_text != text ) {
@@ -318,7 +323,29 @@ window.createMsUploader = function( wikiEditor ) {
 		], */
 		'url': msuVars.path + '/../../api.php',
 		'flash_swf_url': msuVars.path + '/plupload/Moxie.swf',
-		'silverlight_xap_url': msuVars.path + '/plupload/Moxie.xap'
+		'silverlight_xap_url': msuVars.path + '/plupload/Moxie.xap',
+		'initial_page_cats': null
+	});
+
+	$.ajax({
+		url: mw.util.wikiScript( 'api' ),
+		dataType: 'json',
+		type: 'POST',
+		data: {
+			format: 'json',
+			action: 'parse',
+			page: wgPageName,
+			prop: 'categories'
+		},
+		success: function( data ) {
+			var cats = {};
+			if ( data && data.parse && data.parse.categories && data.parse.categories.length ) {
+				for ( var i = 0; i < data.parse.categories.length; i++ ) {
+					cats[data.parse.categories[i]['*']] = true;
+				}
+			}
+			uploader.initial_page_cats = cats;
+		}
 	});
 
 	if (window.DataTransferItem)
