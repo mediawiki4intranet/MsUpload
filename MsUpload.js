@@ -169,7 +169,7 @@ function build( file, uploader ) {
 						uploader.last_page_cats = cats;
 					}
 				});
-			} else {
+			} else if (uploader.last_page_cats) {
 				for ( var i = 0; i < uploader.last_page_cats.length; i++ ) {
 					add_check( uploader.last_page_cats[i] );
 				}
