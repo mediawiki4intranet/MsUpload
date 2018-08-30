@@ -418,7 +418,7 @@ window.createMsUploader = function( wikiEditor ) {
 				var pad = function( c ) { c = ''+c; return c.length < 2 ? '0'+c : c; };
 				// 100 chars because it must be <= 200 bytes
 				file.name = mw.config.get( 'wgTitle' ).replace( /^.*\//, '' ).substr( 0, 100 ) + '_' +
-					d.getFullYear() + '-' + pad( d.getMonth() ) + '-' + pad( d.getDate() ) + '_' +
+					d.getFullYear() + '-' + pad( d.getMonth()+1 ) + '-' + pad( d.getDate() ) + '_' +
 					pad( d.getHours() ) + '-' + pad( d.getMinutes() ) + '-' + pad( d.getSeconds() ) + '_image' + i +
 					'.' + file.name.split( '.' ).pop(); // image_Y-M-D_H-i-s_0.jpg
 			}
